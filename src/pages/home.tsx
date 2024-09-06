@@ -15,9 +15,9 @@ export default function Home() {
           ChatBot
         </Title>
       </Header>
-      <Content className="p-4">
+      <Content className="p-4 ">
         <List
-          className="h-[calc(100vh-165px)] overflow-y-auto mb-4 border border-gray-200 rounded"
+          className="h-[calc(100vh-160px)] overflow-y-auto mb-4 border border-gray-200 rounded bg-white"
           itemLayout="horizontal"
         />
       </Content>
