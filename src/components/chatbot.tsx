@@ -33,6 +33,7 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [selectedOption, setSelectedOption] = useState("Rewrite"); // Default value set to "Rewrite"
 
   // Handle sending messages
   const handleSend = () => {
@@ -43,8 +44,11 @@ export default function ChatBot() {
         sender: "user",
         file: fileList[0],
       };
+
       setMessages([...messages, newMessage]);
+      console.log("message", [...messages, newMessage]);
       setInputText("");
+
       setFileList([]);
 
       setTimeout(() => {
@@ -86,14 +90,15 @@ export default function ChatBot() {
     },
   ];
 
-  const handleMenuClick = (e) => {
-    message.info("Click on menu item.");
-    console.log("click", e);
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    message.info(`Selected: ${e.key}`);
+    setSelectedOption(e.key === "rewrite" ? "Rewrite" : "Feedback");
   };
   const menuProps = {
     items,
     onClick: handleMenuClick,
   };
+
   return (
     <div>
       <Header className="bg-white border-b border-gray-200">
@@ -141,7 +146,7 @@ export default function ChatBot() {
           <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                Choose Option
+                {selectedOption}
                 <DownOutlined />
               </Space>
             </Button>
