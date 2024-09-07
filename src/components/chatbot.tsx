@@ -22,17 +22,20 @@ const { Header, Content, Footer } = Layout;
 const { TextArea } = Input;
 const { Title } = Typography;
 
+type MessageType = "rewrite" | "feedback";
 interface Message {
   id: number;
   text: string;
   sender: "user" | "bot";
   file?: UploadFile;
+  type?: MessageType;
 }
 
 export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [selectedOption, setSelectedOption] = useState<MessageType>("rewrite");
 
   // Handle sending messages
   const handleSend = () => {
@@ -42,34 +45,38 @@ export default function ChatBot() {
         text: inputText.trim(),
         sender: "user",
         file: fileList[0],
+        type: selectedOption,
       };
       setMessages([...messages, newMessage]);
 
       setInputText("");
       setFileList([]);
 
-      fetch('http://localhost:5000/submit', {
-        method: 'POST',
+      fetch("http://localhost:5000/submit", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ question: newMessage.text }),
+        body: JSON.stringify({
+          question: newMessage.text,
+          type: selectedOption,
+        }),
       })
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch((error) => console.error('Error:', error));
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error("Error:", error));
 
       setTimeout(() => {
         const botResponse: Message = {
           id: Date.now(),
           text: "Thank you for your message. How can I assist you further?",
           sender: "bot",
+          type: selectedOption,
         };
         setMessages((prevMessages) => [...prevMessages, botResponse]);
         // speak(botResponse.text);
       }, 1000);
     }
-
   };
 
   // const speak = (text: string) => {
@@ -90,18 +97,18 @@ export default function ChatBot() {
 
   const items = [
     {
-      label: "Feedback",
+      label: "feedback",
       key: "feedback",
     },
     {
-      label: "Rewrite",
+      label: "rewrite",
       key: "rewrite",
     },
   ];
 
-  const handleMenuClick = (e) => {
-    message.info("Click on menu item.");
-    console.log("click", e);
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    message.info(`Selected: ${e.key}`);
+    setSelectedOption(e.key as MessageType);
   };
   const menuProps = {
     items,
@@ -141,7 +148,7 @@ export default function ChatBot() {
                   // onClick={() => speak(item.text)}
                   aria-label="Listen to message"
                   className="mt-2"
-                > 
+                >
                   Listen
                 </Button>
               </div>
@@ -154,7 +161,7 @@ export default function ChatBot() {
           <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                Choose Option
+                {selectedOption}
                 <DownOutlined />
               </Space>
             </Button>
