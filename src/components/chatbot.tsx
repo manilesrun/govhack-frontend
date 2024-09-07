@@ -77,12 +77,12 @@ export default function ChatBot() {
 
   const items = [
     {
-      label: "1st menu item",
-      key: "frontend",
+      label: "Feedback",
+      key: "feedback",
     },
     {
-      label: "2nd menu item",
-      key: "feedback",
+      label: "Rewrite",
+      key: "rewrite",
     },
   ];
 
@@ -141,7 +141,7 @@ export default function ChatBot() {
           <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                Button
+                Choose Option
                 <DownOutlined />
               </Space>
             </Button>
