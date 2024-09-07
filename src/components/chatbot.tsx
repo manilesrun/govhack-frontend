@@ -44,8 +44,20 @@ export default function ChatBot() {
         file: fileList[0],
       };
       setMessages([...messages, newMessage]);
+
       setInputText("");
       setFileList([]);
+
+      fetch('http://localhost:5000/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: newMessage.text }),
+      })
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch((error) => console.error('Error:', error));
 
       setTimeout(() => {
         const botResponse: Message = {
@@ -57,6 +69,7 @@ export default function ChatBot() {
         // speak(botResponse.text);
       }, 1000);
     }
+
   };
 
   // const speak = (text: string) => {
@@ -128,7 +141,7 @@ export default function ChatBot() {
                   // onClick={() => speak(item.text)}
                   aria-label="Listen to message"
                   className="mt-2"
-                >
+                > 
                   Listen
                 </Button>
               </div>
