@@ -1,7 +1,22 @@
-import React, { useState } from "react";
-import { Layout, Input, Button, List, Upload, message, Typography } from "antd";
-import { SendOutlined, PaperClipOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import {
+  Layout,
+  Input,
+  Button,
+  List,
+  Typography,
+  Dropdown,
+  Space,
+  message,
+} from "antd";
+import {
+  SendOutlined,
+  SoundOutlined,
+  DownOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
+import type { MenuProps } from "antd";
 
 const { Header, Content, Footer } = Layout;
 const { TextArea } = Input;
@@ -19,6 +34,7 @@ export default function ChatBot() {
   const [inputText, setInputText] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+  // Handle sending messages
   const handleSend = () => {
     if (inputText.trim() || fileList.length > 0) {
       const newMessage: Message = {
@@ -38,20 +54,46 @@ export default function ChatBot() {
           sender: "bot",
         };
         setMessages((prevMessages) => [...prevMessages, botResponse]);
+        // speak(botResponse.text);
       }, 1000);
     }
   };
 
-  const handleFileUpload = (info: any) => {
-    const { status } = info.file;
-    if (status === "done") {
-      message.success(`${info.file.name} file uploaded successfully.`);
-      setFileList([info.file]);
-    } else if (status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  };
+  // const speak = (text: string) => {
+  //   const synth = window.speechSynthesis;
+  //   const utterance = new SpeechSynthesisUtterance(text);
+  //   synth.speak(utterance); // Reads the text aloud
+  // };
 
+  // const handleFileUpload = (info: any) => {
+  //   const { status } = info.file;
+  //   if (status === "done") {
+  //     message.success(`${info.file.name} file uploaded successfully.`);
+  //     setFileList([info.file]);
+  //   } else if (status === "error") {
+  //     message.error(`${info.file.name} file upload failed.`);
+  //   }
+  // };
+
+  const items = [
+    {
+      label: "1st menu item",
+      key: "frontend",
+    },
+    {
+      label: "2nd menu item",
+      key: "feedback",
+    },
+  ];
+
+  const handleMenuClick = (e) => {
+    message.info("Click on menu item.");
+    console.log("click", e);
+  };
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
   return (
     <div>
       <Header className="bg-white border-b border-gray-200">
@@ -81,6 +123,14 @@ export default function ChatBot() {
                 {item.file && (
                   <p className="mt-2">Attached: {item.file.name}</p>
                 )}
+                <Button
+                  icon={<SoundOutlined />}
+                  // onClick={() => speak(item.text)}
+                  aria-label="Listen to message"
+                  className="mt-2"
+                >
+                  Listen
+                </Button>
               </div>
             </List.Item>
           )}
@@ -88,6 +138,14 @@ export default function ChatBot() {
       </Content>
       <Footer className="mt-5 p-4 bg-white">
         <div className="flex items-center space-x-2">
+          <Dropdown menu={menuProps}>
+            <Button>
+              <Space>
+                Button
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
           <TextArea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -95,15 +153,7 @@ export default function ChatBot() {
             autoSize={{ minRows: 1, maxRows: 1 }}
             className="flex-grow"
           />
-          {/* <Upload
-            accept=".pdf"
-            fileList={fileList}
-            onChange={handleFileUpload}
-            maxCount={1}
-            className="flex-shrink-0"
-          >
-            <Button icon={<PaperClipOutlined />} aria-label="Attach PDF file" />
-          </Upload> */}
+
           <Button
             type="primary"
             icon={<SendOutlined />}

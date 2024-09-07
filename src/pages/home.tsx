@@ -6,10 +6,10 @@ import ControlCenter from "../components/options.tsx";
 export default function Home() {
   return (
     <Layout className="h-screen flex flex-row ">
-      <div className="w-[25%]">
+      {/* <div className="w-[25%]">
         <ControlCenter />
-      </div>
-      <div className="w-[75%]">
+      </div> */}
+      <div className="w-full">
         <Chatbot />
       </div>
     </Layout>
