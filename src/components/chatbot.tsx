@@ -63,27 +63,44 @@ export default function ChatBot() {
         }),
       })
         .then((response) => response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.error("Error:", error));
+        .then((data) => {
+          console.log(data);
+          const botResponse: Message = {
+            id: Date.now(),
+            text: data.answer,
+            sender: "bot",
+            type: selectedOption,
+          };
+          setMessages((prevMessages) => [...prevMessages, botResponse]);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          const botResponse: Message = {
+            id: Date.now(),
+            text: "Sorry, I couldn't process your request. Please try again.",
+            sender: "bot",
+            type: selectedOption,
+          };
+          setMessages((prevMessages) => [...prevMessages, botResponse]);
+        });
 
-      setTimeout(() => {
-        const botResponse: Message = {
-          id: Date.now(),
-          text: "Thank you for your message. How can I assist you further?",
-          sender: "bot",
-          type: selectedOption,
-        };
-        setMessages((prevMessages) => [...prevMessages, botResponse]);
-        // speak(botResponse.text);
-      }, 1000);
+      // setTimeout(() => {
+      //   const botResponse: Message = {
+      //     id: Date.now(),
+      //     text: {response.answer},
+      //     sender: "bot",
+      //     type: selectedOption,
+      //   };
+      //   setMessages((prevMessages) => [...prevMessages, botResponse]);
+      // }, 1000);
     }
   };
 
-  // const speak = (text: string) => {
-  //   const synth = window.speechSynthesis;
-  //   const utterance = new SpeechSynthesisUtterance(text);
-  //   synth.speak(utterance); // Reads the text aloud
-  // };
+  const speak = (text: string) => {
+    const synth = window.speechSynthesis;
+    const utterance = new SpeechSynthesisUtterance(text);
+    synth.speak(utterance); // Reads the text aloud
+  };
 
   // const handleFileUpload = (info: any) => {
   //   const { status } = info.file;
@@ -145,7 +162,7 @@ export default function ChatBot() {
                 )}
                 <Button
                   icon={<SoundOutlined />}
-                  // onClick={() => speak(item.text)}
+                  onClick={() => speak(item.text)}
                   aria-label="Listen to message"
                   className="mt-2"
                 >
