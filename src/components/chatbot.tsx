@@ -83,7 +83,7 @@ export default function ChatBot() {
           console.error("Error:", error);
           const botResponse: Message = {
             id: Date.now(),
-            text: "Unfortunately, at the moment this site cannot be accessed. Please contact Hax Team for further assistance.",
+            text: "Hi, sorry I am not able to answer your question at the moment because our backend is not operated online. This is just meant to be a UI prototype. If you want to have a fully working application, please contact HAX team. Thank you!",
             sender: "bot",
             type: selectedOption,
           };
