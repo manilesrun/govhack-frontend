@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import {
   Layout,
   Input,
@@ -17,18 +18,21 @@ import {
 } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
 import type { MenuProps } from "antd";
+import remarkGfm from "remark-gfm";
 
 const { Header, Content, Footer } = Layout;
 const { TextArea } = Input;
 const { Title } = Typography;
 
 type MessageType = "rewrite" | "feedback";
+type DepartmentType = "ATO" | "home_affairs" | "treasury" | "APSC";
 interface Message {
   id: number;
   text: string;
   sender: "user" | "bot";
   file?: UploadFile;
   type?: MessageType;
+  department?: DepartmentType;
 }
 
 export default function ChatBot() {
@@ -36,6 +40,8 @@ export default function ChatBot() {
   const [inputText, setInputText] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedOption, setSelectedOption] = useState<MessageType>("rewrite");
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<DepartmentType>("APSC");
 
   // Handle sending messages
   const handleSend = () => {
@@ -52,7 +58,7 @@ export default function ChatBot() {
       setInputText("");
       setFileList([]);
 
-      fetch("http://localhost:5000/submit", {
+      fetch("http://127.0.0.1:5000/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +83,7 @@ export default function ChatBot() {
           console.error("Error:", error);
           const botResponse: Message = {
             id: Date.now(),
-            text: "Sorry, I couldn't process your request. Please try again.",
+            text: "Unfortunately, at the moment this site cannot be accessed. Please contact Hax Team for further assistance.",
             sender: "bot",
             type: selectedOption,
           };
@@ -123,9 +129,36 @@ export default function ChatBot() {
     },
   ];
 
+  const departments = [
+    {
+      label: "ATO",
+      key: "ATO",
+    },
+    {
+      label: "Home Affairs",
+      key: "home_affairs",
+    },
+    {
+      label: "Treasury",
+      key: "treasury",
+    },
+    {
+      label: "APSC",
+      key: "APSC",
+    },
+  ];
+
   const handleMenuClick: MenuProps["onClick"] = (e) => {
     message.info(`Selected: ${e.key}`);
     setSelectedOption(e.key as MessageType);
+  };
+  const handleDepartmentClick: MenuProps["onClick"] = (e) => {
+    message.info(`Selected: ${e.key}`);
+    setSelectedDepartment(e.key as DepartmentType);
+  };
+  const departmentProps = {
+    items: departments,
+    onClick: handleDepartmentClick,
   };
   const menuProps = {
     items,
@@ -140,7 +173,7 @@ export default function ChatBot() {
       </Header>
       <Content className="p-4">
         <List
-          className="h-[calc(100vh-195px)] mt-4 border border-gray-200 rounded overflow-y-auto"
+          className="h-[calc(100vh-300px)] mt-4 border border-gray-200 rounded overflow-y-auto"
           itemLayout="horizontal"
           dataSource={messages}
           renderItem={(item) => (
@@ -150,16 +183,13 @@ export default function ChatBot() {
               }
             >
               <div
-                className={`max-w-[70%] p-2 rounded ${
+                className={`max-w-[70%] p-2 rounded text-wrap ${
                   item.sender === "user"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200"
                 }`}
               >
-                <p>{item.text}</p>
-                {item.file && (
-                  <p className="mt-2">Attached: {item.file.name}</p>
-                )}
+                <ReactMarkdown>{item.text}</ReactMarkdown>
                 <Button
                   icon={<SoundOutlined />}
                   onClick={() => speak(item.text)}
@@ -173,22 +203,48 @@ export default function ChatBot() {
           )}
         />
       </Content>
-      <Footer className="mt-5 p-4 bg-white">
-        <div className="flex items-center space-x-2">
+      <Footer>
+        <div style={{ position: "relative", width: "100%" }}>
           <Dropdown menu={menuProps}>
-            <Button>
+            <Button
+              style={{
+                position: "absolute",
+                left: "10px",
+                top: "10px",
+                zIndex: 1,
+              }}
+            >
               <Space>
                 {selectedOption}
                 <DownOutlined />
               </Space>
             </Button>
           </Dropdown>
+          <Dropdown menu={departmentProps}>
+            <Button
+              style={{
+                position: "absolute",
+                left: "10px",
+                top: "50px",
+                zIndex: 1,
+              }}
+            >
+              <Space>
+                {selectedDepartment}
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
+
           <TextArea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Type your message here..."
-            autoSize={{ minRows: 1, maxRows: 1 }}
-            className="flex-grow"
+            autoSize={{ minRows: 6, maxRows: 6 }}
+            style={{
+              paddingLeft: "160px",
+              paddingRight: "60px",
+            }}
           />
 
           <Button
@@ -196,9 +252,12 @@ export default function ChatBot() {
             icon={<SendOutlined />}
             onClick={handleSend}
             aria-label="Send message"
-          >
-            Send
-          </Button>
+            style={{
+              position: "absolute",
+              right: "10px",
+              bottom: "10px",
+            }}
+          />
         </div>
       </Footer>
     </div>
